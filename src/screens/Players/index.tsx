@@ -7,12 +7,14 @@ import { ButtonIcon } from "@components/ButtonIcon";
 import { Filter } from "@components/Filter";
 import { Input } from "@components/Input";
 import { PlayerCard } from '@components/PlayerCard';
+import { ListEmpty } from '@components/ListEmpty';
+import { Button } from '@components/Button';
 
 import { Container, Form, HeaderList, NumberOfPlayers } from "./styles";
 
 export function Players() {
   const [team, setTeam] = useState('Gang A')
-  const [players, setPlayers] = useState(['Jennifer', 'Chewie'])
+  const [players, setPlayers] = useState([])
 
   return (
     <Container>
@@ -62,6 +64,16 @@ export function Players() {
             onRemove={() => {}}
           />
         )}
+        ListEmptyComponent={() => (
+          <ListEmpty message="There is no one in this gang" />
+        )}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[{ paddingBottom: 100 }, players.length === 0 && { flex: 1 }]}
+      />
+
+      <Button
+        title="Remove gang"
+        type="SECONDARY"
       />
     </Container>
   )
