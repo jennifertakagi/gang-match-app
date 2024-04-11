@@ -1,9 +1,9 @@
-
 import { Header } from "@components/Header";
 import { Highlight } from "@components/Highlight";
-
-import { Container } from "./styles";
 import { ButtonIcon } from "@components/ButtonIcon";
+
+import { Container, Form } from "./styles";
+import { Input } from "@components/Input";
 
 export function Players() {
   return (
@@ -15,7 +15,16 @@ export function Players() {
         subtitle="add the peeps and separate the teams"
       />
 
-    <ButtonIcon />
+      <Form>
+        <Input
+          placeholder="Name"
+          autoCorrect={false}
+        />
+
+        <ButtonIcon
+          icon="add"
+        />
+      </Form>
     </Container>
   )
 }
