@@ -19,7 +19,7 @@ export function Header({ showBackButton = false }: Props) {
     <Container>
       {
         showBackButton &&
-        <BackButton>
+        <BackButton onPress={handleGoBack}>
           <BackIcon />
         </BackButton>
       }
