@@ -36,6 +36,7 @@ export function Groups() {
 
       <Button
         title='Add new gang'
+        onPress={handleNewGroup}
       />
     </Container>
   );
