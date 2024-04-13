@@ -71,10 +71,11 @@ export function Players() {
       setIsLoading(true);
       const playersByGang = await playersGetByGroupAndGang(group, gang);
       setPlayers(playersByGang);
-      setIsLoading(false);
     } catch (error) {
       console.log(error);
       Alert.alert('Members', 'It was not possibible to load members of the gang');
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -177,7 +178,7 @@ export function Players() {
               <ListEmpty message="There is no one in this gang" />
             )}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={[{ paddingBottom: 100 }, !players.length && { flex: 1 }]}
+            contentContainerStyle={[{ paddingBottom: 100 }, players.length === 0 && { flex: 1 }]}
           />
       }
 

@@ -29,10 +29,11 @@ export function Groups() {
       setIsLoading(true);
       const data = await groupsGetAll();
       setGroups(data)
-      setIsLoading(false);
     } catch (error) {
       Alert.alert('Gangs', 'It was not possible to load gangs');
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
