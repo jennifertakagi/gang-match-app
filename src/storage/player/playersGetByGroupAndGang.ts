@@ -1,6 +1,6 @@
 import { playersGetByGroup } from './playersGetByGroup';
 
-export async function playersGetByGroupAndTeam(group: string, gang: string) {
+export async function playersGetByGroupAndGang(group: string, gang: string) {
   try {
     const storage = await playersGetByGroup(group);
 

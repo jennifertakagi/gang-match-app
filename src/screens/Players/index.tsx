@@ -6,7 +6,8 @@ import { AppError } from '@utils/AppError';
 
 import { PlayerStorageDTO } from '@storage/player/PlayerStorageDTO';
 import { playerAddByGroup } from '@storage/player/playerAddByGroup';
-import { playersGetByGroupAndTeam } from '@storage/player/playersGetByGroupAndTeam';
+import { playersGetByGroupAndGang } from '@storage/player/playersGetByGroupAndGang';
+import { playerRemoveByGroup } from '@storage/player/playerRemoveByGroup';
 import { groupRemoveByName } from '@storage/group/groupRemoveByName';
 
 import { Header } from "@components/Header";
@@ -14,24 +15,24 @@ import { Highlight } from "@components/Highlight";
 import { ButtonIcon } from "@components/ButtonIcon";
 import { Filter } from "@components/Filter";
 import { Input } from "@components/Input";
+import { Loading } from '@components/Loading';
 import { PlayerCard } from '@components/PlayerCard';
 import { ListEmpty } from '@components/ListEmpty';
 import { Button } from '@components/Button';
 
 import { Container, Form, HeaderList, NumberOfPlayers } from "./styles";
-import { playerRemoveByGroup } from '@storage/player/playerRemoveByGroup';
 
 type RouteParams = {
   group: string;
 }
 
 export function Players() {
-  const navigation = useNavigation();
-
+  const [isLoading, setIsLoading] = useState(true);
   const [newPlayerName, setNewPlayerName] = useState('');
   const [gang, setGang] = useState('Gang A');
   const [players, setPlayers] = useState<PlayerStorageDTO[]>([]);
 
+  const navigation = useNavigation();
   const route = useRoute();
 
   const { group } = route.params as RouteParams;
@@ -54,7 +55,7 @@ export function Players() {
       newPlayerNameInputRef.current?.blur();
 
       setNewPlayerName('');
-      fetchPlayersByTeam();
+      fetchPlayersByGang();
     } catch (error) {
       if(error instanceof AppError){
         Alert.alert('New member', error.message);
@@ -65,11 +66,23 @@ export function Players() {
     }
   }
 
+  async function fetchPlayersByGang() {
+    try {
+      setIsLoading(true);
+      const playersByGang = await playersGetByGroupAndGang(group, gang);
+      setPlayers(playersByGang);
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Members', 'It was not possibible to load members of the gang');
+    }
+  }
+
   async function handlePlayerRemove(playerName: string) {
     try {
       await playerRemoveByGroup(playerName, group);
 
-      fetchPlayersByTeam()
+      fetchPlayersByGang()
 
     } catch (error) {
       console.log(error);
@@ -85,7 +98,7 @@ export function Players() {
 
     } catch (error) {
       console.log(error);
-      Alert.alert('Remover Grupo', 'Não foi posível remover o grupo');
+      Alert.alert('Remove gang', 'It was not possible to remove the gang');
     }
   }
 
@@ -100,18 +113,8 @@ export function Players() {
     )
   }
 
-  async function fetchPlayersByTeam() {
-    try {
-      const playersByTeam = await playersGetByGroupAndTeam(group, gang);
-      setPlayers(playersByTeam);
-    } catch (error) {
-      console.log(error);
-      Alert.alert('Members', 'It was not possible to load members.');
-    }
-  }
-
   useEffect(() => {
-    fetchPlayersByTeam();
+    fetchPlayersByGang();
   },[gang])
 
   return (
@@ -159,21 +162,24 @@ export function Players() {
         </NumberOfPlayers>
       </HeaderList>
 
-      <FlatList
-        data={players}
-        keyExtractor={item => item.name}
-        renderItem={({ item }) => (
-          <PlayerCard
-            name={item.name}
-            onRemove={() => handlePlayerRemove(item.name)}
+      {
+        isLoading ? <Loading /> :
+          <FlatList
+            data={players}
+            keyExtractor={item => item.name}
+            renderItem={({ item }) => (
+              <PlayerCard
+                name={item.name}
+                onRemove={() => handlePlayerRemove(item.name)}
+              />
+            )}
+            ListEmptyComponent={() => (
+              <ListEmpty message="There is no one in this gang" />
+            )}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[{ paddingBottom: 100 }, !players.length && { flex: 1 }]}
           />
-        )}
-        ListEmptyComponent={() => (
-          <ListEmpty message="There is no one in this gang" />
-        )}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[{ paddingBottom: 100 }, !players.length && { flex: 1 }]}
-      />
+      }
 
       <Button
         title="Remove gang"
