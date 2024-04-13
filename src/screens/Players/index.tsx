@@ -18,6 +18,7 @@ import { ListEmpty } from '@components/ListEmpty';
 import { Button } from '@components/Button';
 
 import { Container, Form, HeaderList, NumberOfPlayers } from "./styles";
+import { playerRemoveByGroup } from '@storage/player/playerRemoveByGroup';
 
 type RouteParams = {
   group: string;
@@ -50,7 +51,7 @@ export function Players() {
       newPlayerNameInputRef.current?.blur();
 
       setNewPlayerName('');
-      await fetchPlayersByTeam();
+      fetchPlayersByTeam();
     } catch (error) {
       if(error instanceof AppError){
         Alert.alert('New member', error.message);
@@ -58,6 +59,19 @@ export function Players() {
         console.log(error);
         Alert.alert('New member', 'It was not possible to add them.')
       }
+    }
+  }
+
+  async function handlePlayerRemove(playerName: string) {
+    try {
+      await playerRemoveByGroup(playerName, group);
+
+      fetchPlayersByTeam()
+
+    } catch (error) {
+      console.log(error);
+
+      Alert.alert('Remove member', 'It was not possible to remove this member.');
     }
   }
 
@@ -126,7 +140,7 @@ export function Players() {
         renderItem={({ item }) => (
           <PlayerCard
             name={item.name}
-            onRemove={() => {}}
+            onRemove={() => handlePlayerRemove(item.name)}
           />
         )}
         ListEmptyComponent={() => (
