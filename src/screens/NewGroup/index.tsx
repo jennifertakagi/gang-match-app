@@ -20,7 +20,7 @@ export function NewGroup() {
   async function handleNew() {
     try {
 
-      if(group.trim().length === 0) {
+      if (!group.trim().length) {
         return Alert.alert('New gang', 'Write the gang name.');
       }
 

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { FlatList, Alert } from 'react-native'
+import { useState, useEffect, useRef } from 'react';
+import { FlatList, Alert, TextInput, Keyboard } from 'react-native'
 import { useRoute } from '@react-navigation/native';
 
 import { AppError } from '@utils/AppError';
@@ -32,8 +32,10 @@ export function Players() {
 
   const { group } = route.params as RouteParams;
 
+  const newPlayerNameInputRef = useRef<TextInput>(null);
+
   async function handleAddPlayer() {
-    if(newPlayerName.trim().length === 0) {
+    if (!newPlayerName.trim().length) {
       return Alert.alert('New member', 'Write the name of the member you want to add.');
     }
 
@@ -44,6 +46,10 @@ export function Players() {
 
     try {
       await playerAddByGroup(newPlayer, group);
+
+      newPlayerNameInputRef.current?.blur();
+
+      setNewPlayerName('');
       await fetchPlayersByTeam();
     } catch (error) {
       if(error instanceof AppError){
@@ -75,14 +81,18 @@ export function Players() {
 
       <Highlight
         title={group}
-        subtitle="adicione a galera e separe os times"
+        subtitle="add members to your gangs"
       />
 
       <Form>
         <Input
-          placeholder="Name"
-          autoCorrect={false}
+          inputRef={newPlayerNameInputRef}
+          placeholder="Member name"
+          value={newPlayerName}
           onChangeText={setNewPlayerName}
+          autoCorrect={false}
+          onSubmitEditing={handleAddPlayer}
+          returnKeyType="done"
         />
 
         <ButtonIcon
@@ -112,7 +122,7 @@ export function Players() {
 
       <FlatList
         data={players}
-        keyExtractor={item => item.gang}
+        keyExtractor={item => item.name}
         renderItem={({ item }) => (
           <PlayerCard
             name={item.name}
@@ -123,7 +133,7 @@ export function Players() {
           <ListEmpty message="There is no one in this gang" />
         )}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[{ paddingBottom: 100 }, players.length === 0 && { flex: 1 }]}
+        contentContainerStyle={[{ paddingBottom: 100 }, !players.length && { flex: 1 }]}
       />
 
       <Button

@@ -57,7 +57,7 @@ export function Groups() {
             onPress={() => handleOpenGroup(item)}
           />
         )}
-        contentContainerStyle={groups.length === 0 && { flex: 1 }}
+        contentContainerStyle={!groups.length && { flex: 1 }}
         ListEmptyComponent={() => (
           <ListEmpty message="How about registering the first class?" />
         )}
